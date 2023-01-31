@@ -1,7 +1,9 @@
-const mysql2 = require("mysql2");
+const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const conTable = require("console.table");
-const db = require(".");
+//const db = require("./db");//
+const express = require("express");
+const app = express();
 
 const connection = mysql.createConnection({
     host: "localHost",
