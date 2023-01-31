@@ -1,21 +1,22 @@
 const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const conTable = require("console.table");
-//const db = require("./db");//
+// const db = require("./db");
 const express = require("express");
 const app = express();
+const PORT = 3308;
 
 const connection = mysql.createConnection({
     host: "localHost",
-    port: 3001,
+    port: 3308,
     user: "root",
-    password: "Developer75!",
+    password: "Billions61230",
     database: "employee_info_db"
 });
 
 connection.connect(function(err) {
     if (err) throw err;
-    console.log("connected as id " + connection.threadID);
+    console.log("connected as id " + connection.threadId);
     startScreen();
 });
 
@@ -23,6 +24,8 @@ function startScreen() {
     inquirer
         .createPromptModule({
             type: "list",
+            name: "option",
+            message: "what do you want to do?",
             choices: [
                 "Add department",
                 "Add role",
@@ -33,12 +36,11 @@ function startScreen() {
                 "Update employee role",
                 "Quit"
             ],
-            message: "what do you want to do?",
-            name: "option"
+
         })
         .then(function(results) {
-            console.log("You entered: " + result.option);
-            switch (result.option) {
+            console.log("You entered: " + results.option);
+            switch (results.option) {
                 case "Add department": 
                     addDepartment();
                     break;
@@ -200,3 +202,6 @@ function addEmployee() {
     connection.end();
     process.exit();
   }
+
+app.listen(PORT, () =>
+    console.log(`App listening at http://localhost:${PORT}`));
