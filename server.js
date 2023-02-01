@@ -6,23 +6,27 @@ const express = require("express");
 const app = express();
 const PORT = 3308;
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const connection = mysql.createConnection({
     host: "localHost",
-    port: 3308,
+    port: 3306,
     user: "root",
     password: "Billions61230",
     database: "employee_info_db"
-});
+}, console.log("connection successful to database")
+);
 
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
-    startScreen();
+    firstPrompt();
 });
 
-function startScreen() {
+function firstPrompt() {
     inquirer
-        .createPromptModule({
+        .prompt({
             type: "list",
             name: "option",
             message: "what do you want to do?",
@@ -37,8 +41,7 @@ function startScreen() {
                 "Quit"
             ],
 
-        })
-        .then(function(results) {
+        }).then(function(results) {
             console.log("You entered: " + results.option);
             switch (results.option) {
                 case "Add department": 
@@ -47,7 +50,7 @@ function startScreen() {
                 case "Add role":
                     addRole();
                     break;
-                case "Add Employee":
+                case "Add employee":
                     addEmployee();
                     break;
                 case "View departments":
@@ -56,7 +59,7 @@ function startScreen() {
                 case "View roles":
                     viewRoles();
                     break;
-                case "View Employees":
+                case "View employees":
                     viewEmployees();
                     break;
                 case "Update employee role":
@@ -65,7 +68,7 @@ function startScreen() {
                 default:
                     quit();
             }
-        });
+          });
 }
 
 function addDepartment(){
@@ -77,8 +80,9 @@ function addDepartment(){
         connection.query("INSERT INTO department (name) VALUES (?)", [answer.deptName] , function(err, res) {
             if (err) throw err;
             console.table(res)
-            startScreen()
-    })
+            console.log("Department Added!");
+            firstPrompt()
+        })
     })
 }
 
@@ -101,10 +105,11 @@ function addRole() {
                 name: "deptID"
             }
         ]).then(function(answer) {
-            connection.query("INSERT INTO role (title, salary, department_id VALUES (?, ?, ?)", [answer.roleName, answer.salaryTotal, answer.deptID], function(err, res) {
+            connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [answer.roleName, answer.salaryTotal, answer.deptID], function(err, res) {
                 if (err) throw err;
                 console.table(res);
-                startScreen();
+                console.log("Role Added!");
+                firstPrompt();
             });
         });
 }
@@ -140,7 +145,8 @@ function addEmployee() {
         connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [answer.eeFirstName, answer.eeLastName, answer.roleID, answer.managerID], function(err, res) {
           if (err) throw err;
           console.table(res);
-          startScreen();
+          console.log("Employee Added!");
+          firstPrompt();
         });
       });
   }
@@ -165,7 +171,8 @@ function addEmployee() {
         connection.query('UPDATE employee SET role_id=? WHERE first_name= ?',[answer.updateRole, answer.eeUpdate],function(err, res) {
           if (err) throw err;
           console.table(res);
-          startScreen();
+          console.log("Employee Updated!");
+          firstPrompt();
         });
       });
   }
@@ -176,7 +183,8 @@ function addEmployee() {
     connection.query(query, function(err, res) {
       if (err) throw err;
       console.table(res);
-      startScreen();
+      console.log("Depatments Viewed!");
+      firstPrompt();
     });
   }
   
@@ -185,7 +193,8 @@ function addEmployee() {
     connection.query(query, function(err, res) {
       if (err) throw err;
       console.table(res);
-      startScreen();
+      console.log("Roles Viewed!");
+      firstPrompt();
     });
   }
   
@@ -194,7 +203,8 @@ function addEmployee() {
     connection.query(query, function(err, res) {
       if (err) throw err;
       console.table(res);
-      startScreen();
+      console.log("Employees Viewed!");
+      firstPrompt();
     });
   }
   
@@ -203,5 +213,6 @@ function addEmployee() {
     process.exit();
   }
 
-app.listen(PORT, () =>
+  app.listen(PORT, () =>
     console.log(`App listening at http://localhost:${PORT}`));
+
